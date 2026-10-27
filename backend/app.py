@@ -19,7 +19,21 @@ app.config.update(
     SESSION_COOKIE_SECURE=os.environ.get("COOKIE_SECURE", "false").lower() == "true",
     PERMANENT_SESSION_LIFETIME=60 * 60 * 8,
 )
-CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
+
+CORS(
+    app,
+    supports_credentials=True,
+    resources={
+        r"/api/*": {
+            "origins": [
+                "https://task-3-sentinel-aif.onrender.com",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173"
+            ]
+        }
+    }
+)
+
 model = SentimentModel()
 
 @contextmanager
