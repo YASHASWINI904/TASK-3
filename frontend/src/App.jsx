@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Activity, BrainCircuit, ChartNoAxesCombined, CircleHelp, Clock3, FileText, Gauge, HeartPulse, LayoutDashboard, MessageSquareText, RefreshCw, Send, Server, Settings2, ShieldCheck, Trash2, Zap, Radar, UserRound, Download } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 
-const API='http://127.0.0.1:5000/api';
+const API = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
 const nav=[['Overview',LayoutDashboard],['Sentiment Analyzer',MessageSquareText],['Batch Analysis',FileText],['Risk Radar',Radar],['Prediction History',Clock3],['My Profile',UserRound],['Account Settings',Settings2],['API & Model',Server]];
 const examples=[
   'The product is amazing and the customer service was excellent.',
