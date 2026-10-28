@@ -1,0 +1,29 @@
+services:
+  # Python / Flask API Web Service
+  - type: web
+    name: sentinel-ai-backend
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app -b 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: CORS_ORIGINS
+        value: "http://localhost:5173,http://localhost:4173"
+
+  # React / Vite Static Site
+  - type: web
+    name: sentinel-ai-frontend
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

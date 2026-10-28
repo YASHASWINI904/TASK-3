@@ -4,36 +4,39 @@ from pathlib import Path
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3, json, os
 from contextlib import contextmanager
-from dotenv import load_dotenv
 from datetime import datetime, timezone
 from model_service import SentimentModel
 
 BASE_DIR = Path(__file__).resolve().parent
-load_dotenv(BASE_DIR.parent / '.env')
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR.parent / '.env')
+except Exception:
+    pass
 DB_PATH = BASE_DIR / "sentiment_history.db"
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY") or "dev-only-change-this-secret"
+is_secure = os.environ.get("COOKIE_SECURE", "false").lower() == "true"
+samesite = "None" if is_secure else "Lax"
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=os.environ.get("COOKIE_SECURE", "false").lower() == "true",
+    SESSION_COOKIE_SAMESITE=samesite,
+    SESSION_COOKIE_SECURE=is_secure,
     PERMANENT_SESSION_LIFETIME=60 * 60 * 8,
 )
 
-CORS(
-    app,
-    supports_credentials=True,
-    resources={
-        r"/api/*": {
-            "origins": [
-                "https://task-3-sentinel-aif.onrender.com",
-                "http://localhost:5173",
-                "http://127.0.0.1:5173"
-            ]
-        }
-    }
-)
+allowed_origins = [
+    "https://task-3-sentinel-aif.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+]
+env_origins = os.environ.get("CORS_ORIGINS") or os.environ.get("FRONTEND_URL")
+if env_origins:
+    allowed_origins.extend([o.strip() for o in env_origins.split(",") if o.strip()])
 
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": allowed_origins if not os.environ.get("CORS_ALLOW_ALL") else "*"}})
 model = SentimentModel()
 
 @contextmanager

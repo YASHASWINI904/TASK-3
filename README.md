@@ -58,3 +58,30 @@ python -m unittest discover -s tests -v
 - `GET /api/export.csv`
 
 The application runs locally on the computer where it is started. The local URL is not publicly accessible from other computers unless the application is deployed or network access is configured separately.
+
+## Cloud Deployment Guide
+
+This project is pre-configured for seamless cloud deployment:
+
+### 1. Deploying Frontend to Vercel
+1. Import your GitHub repository (`TASK-3`) into **Vercel**.
+2. Vercel will automatically use the included `vercel.json` and build the frontend.
+3. In **Environment Variables**, set:
+   - `VITE_API_BASE_URL`: URL of your deployed backend (e.g. `https://your-backend.onrender.com/api`).
+4. Click **Deploy**.
+
+### 2. Deploying Frontend to Netlify
+1. Connect the repository to **Netlify**.
+2. Netlify will auto-detect the root `netlify.toml` (Base directory: `frontend`, Build command: `npm run build`, Publish directory: `frontend/dist`).
+3. Set `VITE_API_BASE_URL` in **Site settings → Environment variables**.
+4. Click **Deploy site**.
+
+### 3. Deploying Backend (e.g., Render or Railway)
+- **Render**: Connect repository and select Blueprint deployment using the included `render.yaml`, or create a Python Web Service:
+  - Root directory: `backend`
+  - Build command: `pip install -r requirements.txt`
+  - Start command: `gunicorn app:app -b 0.0.0.0:$PORT`
+  - Environment variables:
+    - `SECRET_KEY`: `<random string>`
+    - `COOKIE_SECURE`: `true`
+    - `CORS_ORIGINS`: `https://your-frontend.vercel.app` (your frontend domain)
