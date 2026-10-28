@@ -16,21 +16,21 @@ except Exception:
 DB_PATH = BASE_DIR / "sentiment_history.db"
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY") or "dev-only-change-this-secret"
-is_secure = os.environ.get("COOKIE_SECURE", "false").lower() == "true"
-samesite = "None" if is_secure else "Lax"
+is_production = os.environ.get("RENDER") == "true" or os.environ.get("COOKIE_SECURE", "").lower() == "true"
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE=samesite,
-    SESSION_COOKIE_SECURE=is_secure,
+    SESSION_COOKIE_SAMESITE="None" if is_production else "Lax",
+    SESSION_COOKIE_SECURE=is_production,
     PERMANENT_SESSION_LIFETIME=60 * 60 * 8,
 )
 
 allowed_origins = [
+    r"https?://.*\.vercel\.app",
+    r"https?://.*\.onrender\.com",
+    r"http://localhost:\d+",
+    r"http://127\.0\.0\.1:\d+",
+    "https://task-3-sentinel.vercel.app",
     "https://task-3-sentinel-aif.onrender.com",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:4173",
-    "http://127.0.0.1:4173",
 ]
 env_origins = os.environ.get("CORS_ORIGINS") or os.environ.get("FRONTEND_URL")
 if env_origins:
